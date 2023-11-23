@@ -1,45 +1,49 @@
 package config
 
 import (
-	"log"
+	"medbuddy-backend/utility"
+	"os"
 
 	"github.com/spf13/viper"
-	"github.com/workshopapps/pictureminer.api/utility"
 )
 
 type Configuration struct {
-	Server  ServerConfiguration
-	Mongodb MongodbConfiguration
-	Redis   RedisConfiguration
+	ServerPort string `mapstructure:"SERVER_PORT"`
+	SecretKey  string `mapstructure:"SECRET_KEY"`
+	MongoHost  string `mapstructure:"MONGO_HOST"`
 }
 
 // Setup initialize configuration
 var (
-	// Params ParamsConfiguration
 	Config *Configuration
 )
 
-//Params = getConfig.Params
 func Setup() {
 	var configuration *Configuration
 	logger := utility.NewLogger()
 
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
+	viper.SetConfigName("sample")
+	viper.SetConfigType("env")
 	viper.AddConfigPath(".")
 
+	// Overwrite file env's from environment
+	viper.AutomaticEnv()
+
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("Error reading config file, %s", err)
+		logger.Fatalf("Error reading config file, %s", err)
 	}
 
 	err := viper.Unmarshal(&configuration)
 	if err != nil {
-		log.Fatalf("Unable to decode into struct, %v", err)
+		logger.Fatalf("Unable to decode into struct, %v", err)
 	}
 
-	// Params = configuration.Params
+	if port := os.Getenv("PORT"); port != "" {
+		configuration.ServerPort = port
+	}
+
 	Config = configuration
-	logger.Info("configurations loading successfully")
+	logger.Info("CONFIGURATIONS LOADED SUCCESSFULLY")
 }
 
 // GetConfig helps you to get configuration data

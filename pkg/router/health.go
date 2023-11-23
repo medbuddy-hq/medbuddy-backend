@@ -2,14 +2,14 @@ package router
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/workshopapps/pictureminer.api/pkg/handler/health"
-	"github.com/workshopapps/pictureminer.api/utility"
+	"medbuddy-backend/pkg/handler/health"
 )
 
-func Health(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger *utility.Logger) *gin.Engine {
+func Health(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger *log.Logger) *gin.Engine {
 
 	health := health.Controller{Validate: validate, Logger: logger}
 

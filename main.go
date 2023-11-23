@@ -1,21 +1,27 @@
 package main
 
 import (
-	"log"
+	"context"
+	"fmt"
+	mdb "medbuddy-backend/pkg/repository/mongo"
+	"medbuddy-backend/utility"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"medbuddy-backend/internal/config"
+	"medbuddy-backend/pkg/router"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/workshopapps/pictureminer.api/internal/config"
-	mdb "github.com/workshopapps/pictureminer.api/pkg/repository/storage/mongo"
-	"github.com/workshopapps/pictureminer.api/utility"
-
-	// "github.com/workshopapps/pictureminer.api/pkg/repository/storage/redis"
-	"github.com/workshopapps/pictureminer.api/pkg/router"
+	// rdb "brief/pkg/repository/storage/redis"
 )
 
 func init() {
 	config.Setup()
-	// redis.SetupRedis() uncomment when you need redis
 	mdb.ConnectToDB()
+	// redis.SetupRedis() uncomment when you need redis
 }
 
 func main() {
@@ -23,8 +29,53 @@ func main() {
 	logger := utility.NewLogger()
 	getConfig := config.GetConfig()
 	validatorRef := validator.New()
-	r := router.Setup(validatorRef, logger)
+	e := router.Setup(validatorRef, logger)
 
-	logger.Info("Server is starting at 127.0.0.1:%s", getConfig.Server.Port)
-	log.Fatal(r.Run(":" + getConfig.Server.Port))
+	// The HTTP Server
+	server := &http.Server{
+		Addr:    fmt.Sprintf("0.0.0.0:%s", getConfig.ServerPort),
+		Handler: e,
+	}
+
+	// Server run context
+	serverCtx, serverCancel := context.WithCancel(context.Background())
+
+	// Listen for syscall signals for process to interrupt/quit
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGTERM, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)
+	go func() {
+		<-sig
+
+		// Shutdown signal with grace period of 30 seconds
+		shutdownCtx, shutdownCancel := context.WithTimeout(serverCtx, 30*time.Second)
+		mdb.DisconnectDB(shutdownCtx)
+
+		go func() {
+			<-shutdownCtx.Done()
+			if shutdownCtx.Err() == context.DeadlineExceeded {
+				logger.Fatal("graceful shutdown timed out.. forcing exit.")
+			}
+		}()
+
+		// Store counter variable in redis
+		// redis.StoreCounter()
+
+		// Trigger graceful shutdown
+		err := server.Shutdown(shutdownCtx)
+		if err != nil {
+			logger.Fatal(err)
+		}
+		shutdownCancel()
+		serverCancel()
+	}()
+
+	// Run the server
+	logger.Infof("Server is now listening on port: %s\n", getConfig.ServerPort)
+	err := server.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
+		logger.Fatal(err)
+	}
+
+	// Wait for server context to be stopped
+	<-serverCtx.Done()
 }
