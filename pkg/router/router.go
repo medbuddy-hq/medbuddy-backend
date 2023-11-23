@@ -11,6 +11,7 @@ import (
 )
 
 func Setup(validate *validator.Validate, logger *log.Logger) *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 
 	// Middlewares
