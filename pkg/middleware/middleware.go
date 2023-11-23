@@ -99,6 +99,36 @@ func Patient() gin.HandlerFunc {
 	}
 }
 
+// Generic is the middleware for patient endpoints
+func Generic() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		token := getToken(c.Request)
+		if token == "" {
+			rd := utility.BuildErrorResponse(http.StatusUnauthorized, constant.StatusFailed,
+				constant.ErrUnauthorized, "no token specified", nil)
+			c.JSON(http.StatusUnauthorized, rd)
+			return
+		}
+
+		claims, err := VerifyToken(token)
+		if err != nil {
+			rd := utility.BuildErrorResponse(http.StatusUnauthorized, constant.StatusFailed,
+				constant.ErrUnauthorized, err.Error(), nil)
+			c.JSON(http.StatusUnauthorized, rd)
+			return
+		}
+
+		// Set details from token in context and execute next handler
+		c.Set("user info", &model.ContextInfo{
+			ID:    claims.ID,
+			Role:  claims.Role,
+			Email: claims.Email,
+		})
+		c.Next()
+	}
+}
+
 // getToken contains logic to fetch token from headers
 func getToken(r *http.Request) (token string) {
 	auth := r.Header.Get("Authorization")

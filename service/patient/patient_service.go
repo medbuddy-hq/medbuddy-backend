@@ -7,7 +7,6 @@ import (
 	"medbuddy-backend/internal/errors"
 	"medbuddy-backend/internal/model"
 	"medbuddy-backend/pkg/middleware"
-	"medbuddy-backend/pkg/repository/mongo"
 	"medbuddy-backend/pkg/repository/storage"
 	"medbuddy-backend/utility"
 )
@@ -43,10 +42,6 @@ func (p *patientService) CreatePatient(data *model.CreatePatientReq) (model.Pati
 		return model.PatientResponse{}, errors.InternalServerError
 	}
 
-	// Get database details
-	db := mongo.GetDB()
-	ctx := context.Background()
-
 	user := model.User{
 		ID:        primitive.NewObjectID(),
 		Firstname: data.Firstname,
@@ -61,7 +56,8 @@ func (p *patientService) CreatePatient(data *model.CreatePatientReq) (model.Pati
 		UpdatedAt: utility.ReturnCurrentTime(),
 	}
 
-	if err := db.CreateUser(ctx, &user); err != nil {
+	ctx := context.Background()
+	if err := p.dbRepo.CreateUser(ctx, &user); err != nil {
 		logger.Error("Error creating user document, error: ", err.Error())
 		return model.PatientResponse{}, errors.InternalServerError
 	}
@@ -73,7 +69,17 @@ func (p *patientService) CreatePatient(data *model.CreatePatientReq) (model.Pati
 		UserID:   user.ID,
 	}
 
-	if err := db.CreatePatient(ctx, &patient); err != nil {
+	_, found, err := p.dbRepo.GetPatientByEmail(ctx, data.Email)
+	if err != nil {
+		logger.Error("Error fetching patient by email, error: ", err.Error())
+		return model.PatientResponse{}, errors.InternalServerError
+	}
+
+	if found {
+		return model.PatientResponse{}, errors.ResourceNotFoundError("patient already exists")
+	}
+
+	if err := p.dbRepo.CreatePatient(ctx, &patient); err != nil {
 		logger.Error("Error creating patient's document, error: ", err.Error())
 		return model.PatientResponse{}, errors.InternalServerError
 	}
@@ -91,10 +97,9 @@ func (p *patientService) CreatePatient(data *model.CreatePatientReq) (model.Pati
 
 func (p *patientService) LoginPatient(data *model.UserLogin) (model.PatientResponse, errors.InternalError) {
 	// Get database details
-	db := mongo.GetDB()
 	ctx := context.Background()
 
-	patient, found, err := db.GetPatientByEmail(ctx, data.Email)
+	patient, found, err := p.dbRepo.GetPatientByEmail(ctx, data.Email)
 	if err != nil {
 		logger.Error("Error fetching patient by email, error: ", err.Error())
 		return model.PatientResponse{}, errors.InternalServerError
@@ -128,8 +133,6 @@ func (p *patientService) LoginPatient(data *model.UserLogin) (model.PatientRespo
 }
 
 func (p *patientService) GetPatient(id string) (model.PatientResponse, errors.InternalError) {
-	// Get database details
-	db := mongo.GetDB()
 	ctx := context.Background()
 
 	oId, err := primitive.ObjectIDFromHex(id)
@@ -138,7 +141,7 @@ func (p *patientService) GetPatient(id string) (model.PatientResponse, errors.In
 		return model.PatientResponse{}, errors.InternalServerError
 	}
 
-	patient, found, err := db.GetPatientByID(ctx, oId)
+	patient, found, err := p.dbRepo.GetPatientByID(ctx, oId)
 	if err != nil {
 		logger.Error("Error fetching patient by id, error: ", err.Error())
 		return model.PatientResponse{}, errors.InternalServerError
@@ -152,11 +155,9 @@ func (p *patientService) GetPatient(id string) (model.PatientResponse, errors.In
 }
 
 func (p *patientService) GetPatientByEmail(email string) (model.PatientResponse, errors.InternalError) {
-	// Get database details
-	db := mongo.GetDB()
 	ctx := context.Background()
 
-	patient, found, err := db.GetPatientByEmail(ctx, email)
+	patient, found, err := p.dbRepo.GetPatientByEmail(ctx, email)
 	if err != nil {
 		logger.Error("Error fetching patient by email, error: ", err.Error())
 		return model.PatientResponse{}, errors.InternalServerError

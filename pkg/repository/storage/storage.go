@@ -23,4 +23,11 @@ type StorageRepository interface {
 
 	// User
 	CreateUser(ctx context.Context, data *model.User) error
+
+	// Medicine
+	AddMedicine(ctx context.Context, data *model.Medicine) error
+	GetMedicineByID(ctx context.Context, id primitive.ObjectID) (medicine model.Medicine, found bool, err error)
+	UpdateMedicine(ctx context.Context, id primitive.ObjectID, data *model.Medicine) (found bool, err error)
+	DeleteMedicine(ctx context.Context, id primitive.ObjectID) (found bool, err error)
+	GetMedicineFilter(ctx context.Context, req *model.MedicineFilter) (medicine model.Medicine, found bool, err error)
 }

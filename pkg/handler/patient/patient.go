@@ -40,7 +40,7 @@ func (base *Controller) LoginPatient(c *gin.Context) {
 func (base *Controller) CreatePatient(c *gin.Context) {
 	var data model.CreatePatientReq
 
-	if err := c.Bind(&data); err != nil {
+	if err := c.BindJSON(&data); err != nil {
 		base.Logger.Error("Error when binding request body, error: ", err.Error())
 		rd := utility.BuildErrorResponse(http.StatusInternalServerError, constant.StatusFailed, constant.ErrRequest, constant.ErrRequest, nil)
 		c.JSON(rd.Code, rd)

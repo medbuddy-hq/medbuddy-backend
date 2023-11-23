@@ -24,6 +24,7 @@ func Setup(validate *validator.Validate, logger *log.Logger) *gin.Engine {
 	Health(r, validate, ApiVersion, logger)
 	Auth(r, validate, ApiVersion, logger)
 	Patient(r, validate, ApiVersion, logger)
+	Medicine(r, validate, ApiVersion, logger)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{

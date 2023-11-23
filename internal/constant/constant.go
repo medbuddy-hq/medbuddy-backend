@@ -22,4 +22,6 @@ const (
 	UsersCollection         = "users"
 	PatientsCollection      = "patients"
 	PractitionersCollection = "practitioners"
+	MedicineCollection      = "medicines"
+	MedicationCollection    = "medications"
 )
