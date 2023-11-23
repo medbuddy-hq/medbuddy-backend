@@ -42,6 +42,17 @@ func (p *patientService) CreatePatient(data *model.CreatePatientReq) (model.Pati
 		return model.PatientResponse{}, errors.InternalServerError
 	}
 
+	ctx := context.Background()
+	_, found, err := p.dbRepo.GetPatientByEmail(ctx, data.Email)
+	if err != nil {
+		logger.Error("Error fetching patient by email, error: ", err.Error())
+		return model.PatientResponse{}, errors.InternalServerError
+	}
+
+	if found {
+		return model.PatientResponse{}, errors.ResourceNotFoundError("patient already exists")
+	}
+
 	user := model.User{
 		ID:        primitive.NewObjectID(),
 		Firstname: data.Firstname,
@@ -56,7 +67,6 @@ func (p *patientService) CreatePatient(data *model.CreatePatientReq) (model.Pati
 		UpdatedAt: utility.ReturnCurrentTime(),
 	}
 
-	ctx := context.Background()
 	if err := p.dbRepo.CreateUser(ctx, &user); err != nil {
 		logger.Error("Error creating user document, error: ", err.Error())
 		return model.PatientResponse{}, errors.InternalServerError
@@ -67,16 +77,6 @@ func (p *patientService) CreatePatient(data *model.CreatePatientReq) (model.Pati
 		FullName: data.Firstname + " " + data.Lastname,
 		Email:    data.Email,
 		UserID:   user.ID,
-	}
-
-	_, found, err := p.dbRepo.GetPatientByEmail(ctx, data.Email)
-	if err != nil {
-		logger.Error("Error fetching patient by email, error: ", err.Error())
-		return model.PatientResponse{}, errors.InternalServerError
-	}
-
-	if found {
-		return model.PatientResponse{}, errors.ResourceNotFoundError("patient already exists")
 	}
 
 	if err := p.dbRepo.CreatePatient(ctx, &patient); err != nil {
