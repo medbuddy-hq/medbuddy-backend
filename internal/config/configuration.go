@@ -22,7 +22,7 @@ func Setup() {
 	var configuration *Configuration
 	logger := utility.NewLogger()
 
-	viper.SetConfigName("mine")
+	viper.SetConfigName("sample")
 	viper.SetConfigType("env")
 	viper.AddConfigPath(".")
 
