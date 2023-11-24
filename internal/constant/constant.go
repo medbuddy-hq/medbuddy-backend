@@ -24,4 +24,11 @@ const (
 	PractitionersCollection = "practitioners"
 	MedicineCollection      = "medicines"
 	MedicationCollection    = "medications"
+	DosageCollection        = "dosages"
+)
+
+const (
+	DosageTaken    = "taken"
+	DosageSkipped  = "skipped"
+	DosageNotTaken = "not taken"
 )

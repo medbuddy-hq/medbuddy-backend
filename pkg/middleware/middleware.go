@@ -32,6 +32,7 @@ func Practitioner() gin.HandlerFunc {
 			rd := utility.BuildErrorResponse(http.StatusUnauthorized, constant.StatusFailed,
 				constant.ErrUnauthorized, "no token specified", nil)
 			c.JSON(http.StatusUnauthorized, rd)
+			c.Abort()
 			return
 		}
 
@@ -40,6 +41,7 @@ func Practitioner() gin.HandlerFunc {
 			rd := utility.BuildErrorResponse(http.StatusUnauthorized, constant.StatusFailed,
 				constant.ErrUnauthorized, err.Error(), nil)
 			c.JSON(http.StatusUnauthorized, rd)
+			c.Abort()
 			return
 		}
 
@@ -48,6 +50,7 @@ func Practitioner() gin.HandlerFunc {
 			rd := utility.BuildErrorResponse(http.StatusUnauthorized, constant.StatusFailed,
 				constant.ErrUnauthorized, "cannot access this endpoint", nil)
 			c.JSON(http.StatusUnauthorized, rd)
+			c.Abort()
 			return
 		}
 
@@ -70,6 +73,7 @@ func Patient() gin.HandlerFunc {
 			rd := utility.BuildErrorResponse(http.StatusUnauthorized, constant.StatusFailed,
 				constant.ErrUnauthorized, "no token specified", nil)
 			c.JSON(http.StatusUnauthorized, rd)
+			c.Abort()
 			return
 		}
 
@@ -78,6 +82,7 @@ func Patient() gin.HandlerFunc {
 			rd := utility.BuildErrorResponse(http.StatusUnauthorized, constant.StatusFailed,
 				constant.ErrUnauthorized, err.Error(), nil)
 			c.JSON(http.StatusUnauthorized, rd)
+			c.Abort()
 			return
 		}
 
@@ -86,6 +91,7 @@ func Patient() gin.HandlerFunc {
 			rd := utility.BuildErrorResponse(http.StatusUnauthorized, constant.StatusFailed,
 				constant.ErrUnauthorized, "cannot access this endpoint", nil)
 			c.JSON(http.StatusUnauthorized, rd)
+			c.Abort()
 			return
 		}
 
@@ -108,6 +114,7 @@ func Generic() gin.HandlerFunc {
 			rd := utility.BuildErrorResponse(http.StatusUnauthorized, constant.StatusFailed,
 				constant.ErrUnauthorized, "no token specified", nil)
 			c.JSON(http.StatusUnauthorized, rd)
+			c.Abort()
 			return
 		}
 
@@ -116,6 +123,7 @@ func Generic() gin.HandlerFunc {
 			rd := utility.BuildErrorResponse(http.StatusUnauthorized, constant.StatusFailed,
 				constant.ErrUnauthorized, err.Error(), nil)
 			c.JSON(http.StatusUnauthorized, rd)
+			c.Abort()
 			return
 		}
 

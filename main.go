@@ -29,6 +29,7 @@ func main() {
 	logger := utility.NewLogger()
 	getConfig := config.GetConfig()
 	validatorRef := validator.New()
+	//gin.SetMode(gin.ReleaseMode)
 	e := router.Setup(validatorRef, logger)
 
 	// The HTTP Server

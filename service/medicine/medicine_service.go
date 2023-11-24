@@ -10,7 +10,7 @@ import (
 )
 
 type MedicineService interface {
-	AddMedicine(data *model.MedicineRequest) errors.InternalError
+	AddMedicine(data *model.MedicineRequest) (model.Medicine, errors.InternalError)
 	GetMedicine(id string) (model.Medicine, errors.InternalError)
 	GetMedicineFilter(req *model.MedicineFilter) (model.Medicine, errors.InternalError)
 	UpdateMedicine(id string, data *model.MedicineRequest) (model.Medicine, errors.InternalError)
@@ -29,8 +29,10 @@ var (
 	logger = utility.NewLogger()
 )
 
-func (m *medicineService) AddMedicine(data *model.MedicineRequest) errors.InternalError {
+func (m *medicineService) AddMedicine(data *model.MedicineRequest) (model.Medicine, errors.InternalError) {
 	data.ID = primitive.NewObjectID()
+	data.CreatedAt = utility.ReturnCurrentTime()
+	data.UpdatedAt = utility.ReturnCurrentTime()
 	medicine := utility.MedicineRequestToMedicine(data)
 	ctx := context.Background()
 
@@ -43,19 +45,19 @@ func (m *medicineService) AddMedicine(data *model.MedicineRequest) errors.Intern
 	_, found, err := m.dbRepo.GetMedicineFilter(ctx, &medFilter)
 	if err != nil {
 		logger.Error("Error fetching medicine by filters, error: ", err.Error())
-		return errors.InternalServerError
+		return model.Medicine{}, errors.InternalServerError
 	}
 
 	if found {
-		return errors.BadRequestError("medicine already exists")
+		return model.Medicine{}, errors.BadRequestError("medicine already exists")
 	}
 
 	if err := m.dbRepo.AddMedicine(ctx, &medicine); err != nil {
 		logger.Error("Error adding medicine, error: ", err.Error())
-		return errors.InternalServerError
+		return model.Medicine{}, errors.InternalServerError
 	}
 
-	return nil
+	return medicine, nil
 }
 
 func (m *medicineService) GetMedicine(id string) (model.Medicine, errors.InternalError) {
@@ -64,8 +66,10 @@ func (m *medicineService) GetMedicine(id string) (model.Medicine, errors.Interna
 	oId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		logger.Error("Error converting hex Id to objectId, error: ", err.Error())
-		return model.Medicine{}, errors.InternalServerError
+		return model.Medicine{}, errors.BadRequestError("invalid medicine id")
 	}
+
+	logger.Info("oid: ", oId)
 
 	medicine, found, err := m.dbRepo.GetMedicineByID(ctx, oId)
 	if err != nil {
@@ -104,8 +108,8 @@ func (m *medicineService) UpdateMedicine(id string, data *model.MedicineRequest)
 		logger.Error("Error converting hex Id to objectId, error: ", err.Error())
 		return model.Medicine{}, errors.InternalServerError
 	}
+
 	data.ID = oId
-	data.CreatedAt = utility.ReturnCurrentTime()
 	data.UpdatedAt = utility.ReturnCurrentTime()
 
 	medicine := utility.MedicineRequestToMedicine(data)

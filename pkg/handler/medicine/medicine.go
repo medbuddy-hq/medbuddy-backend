@@ -24,13 +24,14 @@ func (base *Controller) AddMedicine(c *gin.Context) {
 		return
 	}
 
-	if err := base.MedicineService.AddMedicine(&data); err != nil {
+	res, err := base.MedicineService.AddMedicine(&data)
+	if err != nil {
 		rd := utility.BuildErrorResponse(err.Code(), constant.StatusFailed, constant.ErrRequest, err.Error(), nil)
 		c.JSON(err.Code(), rd)
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "successfully added medicine", nil)
+	rd := utility.BuildSuccessResponse(http.StatusCreated, "successfully added medicine", res)
 	c.JSON(rd.Code, rd)
 }
 
@@ -67,7 +68,7 @@ func (base *Controller) GetMedicineFilter(c *gin.Context) {
 	}
 
 	if err := base.Validate.Struct(medFilter); err != nil {
-		rd := utility.BuildErrorResponse(http.StatusBadRequest, constant.StatusFailed, constant.ErrValidation, "ensure all required query parameters are set", nil)
+		rd := utility.BuildErrorResponse(http.StatusBadRequest, constant.StatusFailed, constant.ErrValidation, "name, manufacturer and strength are required", nil)
 		c.JSON(rd.Code, rd)
 		return
 	}

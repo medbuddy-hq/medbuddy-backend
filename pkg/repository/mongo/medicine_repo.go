@@ -32,7 +32,7 @@ func (m *Mongo) GetMedicineByID(ctx context.Context, id primitive.ObjectID) (med
 	ctx, cancel = context.WithTimeout(ctx, m.timeout)
 	defer cancel()
 
-	filter := bson.D{{"id", id}}
+	filter := bson.D{{"_id", id}}
 	if err := mColl.FindOne(ctx, filter).Decode(&medicine); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return model.Medicine{}, false, nil
@@ -79,7 +79,8 @@ func (m *Mongo) UpdateMedicine(ctx context.Context, id primitive.ObjectID, data 
 	ctx, cancel = context.WithTimeout(ctx, m.timeout)
 	defer cancel()
 
-	res, err := mColl.UpdateByID(ctx, id, data)
+	update := bson.D{{"$set", data}}
+	res, err := mColl.UpdateByID(ctx, id, update)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return false, nil
@@ -102,7 +103,7 @@ func (m *Mongo) DeleteMedicine(ctx context.Context, id primitive.ObjectID) (foun
 	ctx, cancel = context.WithTimeout(ctx, m.timeout)
 	defer cancel()
 
-	filter := bson.D{{"id", id}}
+	filter := bson.D{{"_id", id}}
 	res, err := mColl.DeleteOne(ctx, filter)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {

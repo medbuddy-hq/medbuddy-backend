@@ -21,6 +21,7 @@ func FormatTime(dateParams string) (outputTime time.Time, err error) {
 	if len(dateParams) > 0 {
 		dateTime, err := time.Parse("2006-01-02", dateParams)
 		if err != nil {
+			NewLogger().Error("Error parsing startDate, error: ", err.Error())
 			return formattedDate, errors.New("date format should be YYYY-MM-DD")
 		}
 		formattedDate = dateTime

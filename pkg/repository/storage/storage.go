@@ -30,4 +30,20 @@ type StorageRepository interface {
 	UpdateMedicine(ctx context.Context, id primitive.ObjectID, data *model.Medicine) (found bool, err error)
 	DeleteMedicine(ctx context.Context, id primitive.ObjectID) (found bool, err error)
 	GetMedicineFilter(ctx context.Context, req *model.MedicineFilter) (medicine model.Medicine, found bool, err error)
+
+	// Medication
+	AddMedication(ctx context.Context, data *model.Medication) error
+	UpdateMedication(ctx context.Context, id primitive.ObjectID, data *model.MedicationRequest) (found bool, err error)
+	DeleteMedication(ctx context.Context, id primitive.ObjectID) (found bool, err error)
+	GetMedication(ctx context.Context, id primitive.ObjectID) (medic model.MedicationResponse, found bool, err error)
+	GetPatientsMedications(ctx context.Context, patientId primitive.ObjectID) (medics []model.MedicationResponse, err error)
+
+	// Practitioner
+
+	// Dosage
+	SaveDosages(ctx context.Context, data []model.Dosage) error
+	GetPatientDosages(ctx context.Context, request *model.DosageFilter) (dosages []model.DosageResponse, err error)
+	SetStatus(ctx context.Context, dosageId, patientId primitive.ObjectID, status string) (found bool, err error)
+	GetDosage(ctx context.Context, id primitive.ObjectID) (dosage model.DosageResponse, found bool, err error)
+	DeleteDosages(ctx context.Context, medicationId primitive.ObjectID) (int64, error)
 }

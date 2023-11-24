@@ -22,7 +22,8 @@ func Medicine(r *gin.Engine, validate *validator.Validate, ApiVersion string, lo
 		medicineUrl.POST("/medicine", middleware.Generic(), medicineCtrl.AddMedicine)
 		medicineUrl.GET("/medicine/:id", middleware.Generic(), medicineCtrl.GetMedicine)
 		medicineUrl.GET("/medicine", middleware.Generic(), medicineCtrl.GetMedicineFilter)
-		medicineUrl.PATCH("/medicine/:id", middleware.Generic(), medicineCtrl.UpdateMedicine)
+		//medicineUrl.GET("/list_medicine", middleware.Generic(), medicineCtrl.ListMedicines)
+		medicineUrl.PUT("/medicine/:id", middleware.Generic(), medicineCtrl.UpdateMedicine)
 		medicineUrl.DELETE("/medicine/:id", middleware.Generic(), medicineCtrl.DeleteMedicine)
 	}
 	return r
