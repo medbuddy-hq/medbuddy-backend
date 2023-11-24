@@ -24,20 +24,20 @@ type DosageResponse struct {
 	TimeSkipped  time.Time           `json:"time_skipped,omitempty" bson:"time_skipped"`
 	IsActive     bool                `json:"is_active" bson:"is_active"`
 	MedicationID primitive.ObjectID  `json:"medication_id" bson:"medication_id"`
-	Medication   MedicationForDosage `json:"medication"`
+	Medication   MedicationForDosage `json:"medication" bson:"medication"`
 	PatientID    primitive.ObjectID  `json:"patient_id" bson:"patient_id"`
 }
 
 type MedicationForDosage struct {
-	Name                string             `bson:"name" json:"name,omitempty"`
-	StartDate           time.Time          `bson:"start_date" json:"start_date"`                                   // date to start taking the medicine
-	DosageQuantity      string             `bson:"dosage_quantity" json:"dosage_quantity,omitempty"`               // measure (quantity) of medicine taken per dosage
-	DailyDosage         int                `bson:"daily_dosage" json:"daily_dosage,omitempty"`                     // measure (quantity) of dosage per day
-	TotalNumberOfDosage int                `bson:"total_number_of_dosage" json:"total_number_of_dosage,omitempty"` // total number of dosages
-	DosagesTaken        int                `bson:"dosages_taken" json:"dosages_taken,omitempty"`
-	Treatment           string             `bson:"treatment" json:"treatment,omitempty"` // sickness/disease
-	Comment             string             `bson:"comment" json:"comment,omitempty"`
-	Medicine            primitive.ObjectID `bson:"medicine" json:"medicine"`
+	Name                string    `bson:"name" json:"name,omitempty"`
+	StartDate           time.Time `bson:"start_date" json:"start_date"`                                   // date to start taking the medicine
+	DosageQuantity      string    `bson:"dosage_quantity" json:"dosage_quantity,omitempty"`               // measure (quantity) of medicine taken per dosage
+	DailyDosage         int       `bson:"daily_dosage" json:"daily_dosage,omitempty"`                     // measure (quantity) of dosage per day
+	TotalNumberOfDosage int       `bson:"total_number_of_dosage" json:"total_number_of_dosage,omitempty"` // total number of dosages
+	DosagesTaken        int       `bson:"dosages_taken" json:"dosages_taken,omitempty"`
+	Treatment           string    `bson:"treatment" json:"treatment,omitempty"` // sickness/disease
+	Comment             string    `bson:"comment" json:"comment,omitempty"`
+	Medicine            Medicine  `bson:"medicine" json:"medicine"`
 }
 
 type DosageFilter struct {

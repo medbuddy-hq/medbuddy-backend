@@ -3,10 +3,10 @@ package model
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Patient struct {
-	ID       primitive.ObjectID `bson:"_id"`
-	FullName string             `bson:"full_name"`
-	Email    string             `bson:"email"`
-	UserID   primitive.ObjectID `bson:"user_id"`
+	ID       primitive.ObjectID `bson:"_id" json:"_id,omitempty"`
+	FullName string             `bson:"full_name" json:"full_name,omitempty"`
+	Email    string             `bson:"email" json:"email,omitempty"`
+	UserID   primitive.ObjectID `bson:"user_id" json:"user_id,omitempty"`
 }
 
 type CreatePatientReq struct {

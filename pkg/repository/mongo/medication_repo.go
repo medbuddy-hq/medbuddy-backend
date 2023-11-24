@@ -79,15 +79,25 @@ func (m *Mongo) GetMedication(ctx context.Context, id primitive.ObjectID) (medic
 	ctx, cancel = context.WithTimeout(ctx, m.timeout)
 	defer cancel()
 
-	filter := bson.D{{"_id", id}}
-	if err := mColl.FindOne(ctx, filter).Decode(&medic); err != nil {
-		if err == mongo.ErrNoDocuments {
-			return model.MedicationResponse{}, false, nil
-		}
+	medics := []model.MedicationResponse{}
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{"_id", id}}}}
+	medLookupStage, medUnwindStage := getMedicineLookupAndUnwindStage()
+
+	pipeline := mongo.Pipeline{matchStage, medLookupStage, medUnwindStage}
+	cur, err := mColl.Aggregate(ctx, pipeline)
+	if err != nil {
 		return model.MedicationResponse{}, false, err
 	}
 
-	return medic, true, nil
+	if err := cur.All(ctx, &medics); err != nil {
+		return model.MedicationResponse{}, false, err
+	}
+
+	if len(medics) <= 0 {
+		return model.MedicationResponse{}, false, nil
+	}
+
+	return medics[0], true, nil
 }
 
 func (m *Mongo) GetPatientsMedications(ctx context.Context, patientId primitive.ObjectID) (medics []model.MedicationResponse, err error) {

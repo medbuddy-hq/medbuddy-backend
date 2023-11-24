@@ -39,22 +39,22 @@ type MedicationRequest struct {
 }
 
 type MedicationResponse struct {
-	ID                  primitive.ObjectID `json:"id,omitempty"`
-	Name                string             `json:"name,omitempty"`
-	StartDate           time.Time          `json:"start_date"`
-	EndDate             time.Time          `json:"end_date"`
-	DosageQuantity      string             `json:"dosage_quantity,omitempty"`
-	DailyDosage         int                `json:"daily_dosage,omitempty"`
-	Dosages             []Dosage           `json:"dosages,omitempty"`
-	DosagesTaken        int                `json:"dosages_taken"`
-	TotalNumberOfDosage int                `json:"total_number_of_dosage"` // total number of dosages
-	Treatment           string             `json:"treatment,omitempty"`
-	Comment             string             `json:"comment"`
-	IsActive            bool               `json:"is_active"`
-	CreatedAt           time.Time          `json:"created_at"`
-	UpdatedAt           time.Time          `json:"updated_at"`
-	MedicineID          primitive.ObjectID `json:"medicine_id,omitempty"`
-	Medicine            Medicine           `json:"medicine"`
-	PatientID           primitive.ObjectID `json:"patient_id"`
-	Patient             Patient            `json:"patient"`
+	ID                  primitive.ObjectID `json:"_id,omitempty" bson:"_id"`
+	Name                string             `json:"name,omitempty" bson:"name"`
+	StartDate           time.Time          `json:"start_date" bson:"start_date"`
+	EndDate             time.Time          `json:"end_date" bson:"end_date"`
+	DosageQuantity      string             `json:"dosage_quantity,omitempty" bson:"dosage_quantity"`
+	DailyDosage         int                `json:"daily_dosage,omitempty" bson:"daily_dosage"`
+	Dosages             []Dosage           `json:"dosages,omitempty" bson:"dosages"`
+	DosagesTaken        int                `json:"dosages_taken" bson:"dosages_taken"`
+	TotalNumberOfDosage int                `json:"total_number_of_dosage" bson:"total_number_of_dosage"` // total number of dosages
+	Treatment           string             `json:"treatment,omitempty" bson:"treatment"`
+	Comment             string             `json:"comment" bson:"comment"`
+	IsActive            bool               `json:"is_active" bson:"is_active"`
+	CreatedAt           time.Time          `json:"created_at" bson:"created_at"`
+	UpdatedAt           time.Time          `json:"updated_at" bson:"updated_at"`
+	MedicineID          primitive.ObjectID `json:"medicine_id,omitempty" bson:"medicine_id"`
+	Medicine            Medicine           `json:"medicine" bson:"medicine"`
+	PatientID           primitive.ObjectID `json:"patient_id" bson:"patient_id"`
+	Patient             Patient            `json:"patient" bson:"patient"`
 }

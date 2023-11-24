@@ -99,7 +99,7 @@ func (m *medicationService) AddMedication(userInfo *model.ContextInfo, data *mod
 
 	for i := range dosages {
 		dosages[i].ID = primitive.NewObjectID()
-		dosages[i].MedicationID = medication.PatientID
+		dosages[i].MedicationID = medication.ID
 		dosages[i].PatientID = patientID
 	}
 
@@ -168,13 +168,13 @@ func (m *medicationService) UpdateMedication(userInfo *model.ContextInfo, id str
 func (m *medicationService) DeleteMedication(userInfo *model.ContextInfo, id string) errors.InternalError {
 	ctx := context.Background()
 
-	oId, err := primitive.ObjectIDFromHex(id)
+	medId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		logger.Error("Error converting hex Id to objectId, error: ", err.Error())
 		return errors.InternalServerError
 	}
 
-	count, err := m.dbRepo.DeleteDosages(ctx, oId)
+	count, err := m.dbRepo.DeleteDosages(ctx, medId)
 	if err != nil {
 		logger.Error("Error deleting dosages, error: ", err.Error())
 		return errors.InternalServerError
@@ -182,7 +182,7 @@ func (m *medicationService) DeleteMedication(userInfo *model.ContextInfo, id str
 
 	logger.Infof("Matched and deleted %v dosage(s)", count)
 
-	found, err := m.dbRepo.DeleteMedication(ctx, oId)
+	found, err := m.dbRepo.DeleteMedication(ctx, medId)
 	if err != nil {
 		logger.Error("Error deleting medication by id, error: ", err.Error())
 		return errors.InternalServerError

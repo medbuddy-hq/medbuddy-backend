@@ -26,9 +26,10 @@ func GetDosages(startDate time.Time, medic *model.MedicationRequest) ([]model.Do
 
 	var dosages []model.Dosage
 	var counter int
+	var previousTimeRef = startDate
 	for i := 0; i < medic.TotalNumberOfDosage; i++ {
 		currentDosageTime := times[counter]
-		reminderTime := time.Date(startDate.Year(), startDate.Month(), startDate.Day(), currentDosageTime.Hour(),
+		reminderTime := time.Date(previousTimeRef.Year(), previousTimeRef.Month(), previousTimeRef.Day(), currentDosageTime.Hour(),
 			currentDosageTime.Minute(), currentDosageTime.Second(), currentDosageTime.Nanosecond(), time.Local)
 		if i > 0 {
 			// check if this current reminder time is before the previous saved time
@@ -38,6 +39,7 @@ func GetDosages(startDate time.Time, medic *model.MedicationRequest) ([]model.Do
 			}
 		}
 
+		previousTimeRef = reminderTime
 		dose := model.Dosage{
 			ReminderTime: reminderTime,
 			Status:       constant.DosageNotTaken,

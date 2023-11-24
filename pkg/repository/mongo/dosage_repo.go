@@ -61,7 +61,7 @@ func (m *Mongo) GetPatientDosages(ctx context.Context, request *model.DosageFilt
 	matchStage := bson.D{{Key: "$match", Value: filter}}
 	medicLookupStage, medicUnwindStage := getMedicationLookupAndUnwindStage()
 	medLookupStage, medUnwindStage := getDosageMedicineLookupAndUnwindStage()
-	sortStage := bson.D{{Key: "$sort", Value: bson.D{{"reminder_time", -1}}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.D{{"reminder_time", 1}}}}
 
 	pipeline := mongo.Pipeline{matchStage, medicLookupStage, medicUnwindStage, medLookupStage, medUnwindStage, sortStage}
 	cur, err := dColl.Aggregate(ctx, pipeline)

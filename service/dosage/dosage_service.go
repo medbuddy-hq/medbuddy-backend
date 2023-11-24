@@ -58,7 +58,7 @@ func (d *dosageService) GetPatientsDosages(uInfo model.ContextInfo, isActive *bo
 
 	dosages, err := d.dbRepo.GetPatientDosages(ctx, &filter)
 	if err != nil {
-		logger.Error("Error getting active dosages, error: ", err.Error())
+		logger.Error("Error getting dosages, error: ", err.Error())
 		return nil, errors.InternalServerError
 	}
 
@@ -75,7 +75,13 @@ func (d *dosageService) SetDosageStatus(uInfo *model.ContextInfo, status string,
 		return errors.InternalServerError
 	}
 
-	dosage, found, err := d.dbRepo.GetDosage(ctx, oId)
+	dId, err := primitive.ObjectIDFromHex(dosageId)
+	if err != nil {
+		logger.Error("Error converting hex Id to objectId at GetPatientDosages, error: ", err.Error())
+		return errors.InternalServerError
+	}
+
+	dosage, found, err := d.dbRepo.GetDosage(ctx, dId)
 	if err != nil {
 		logger.Error("Error fetching dosage document, error: ", err.Error())
 		return errors.InternalServerError
@@ -87,12 +93,6 @@ func (d *dosageService) SetDosageStatus(uInfo *model.ContextInfo, status string,
 
 	if dosage.Status == constant.DosageSkipped || dosage.Status == constant.DosageTaken || !dosage.IsActive {
 		return errors.BadRequestError("status of dosage cannot be set again")
-	}
-
-	dId, err := primitive.ObjectIDFromHex(dosageId)
-	if err != nil {
-		logger.Error("Error converting hex Id to objectId at GetPatientDosages, error: ", err.Error())
-		return errors.InternalServerError
 	}
 
 	if status != constant.DosageSkipped && status != constant.DosageTaken {
