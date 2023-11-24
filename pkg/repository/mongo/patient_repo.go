@@ -13,15 +13,6 @@ func (m *Mongo) CreatePatient(ctx context.Context, data *model.Patient) error {
 	db := m.mongoclient.Database(constant.AppName)
 	pColl := db.Collection(constant.PatientsCollection)
 
-	_, found, err := m.GetPatientByEmail(ctx, data.Email)
-	if err != nil {
-		return err
-	}
-
-	if found {
-		return constant.ErrResourceAlreadyExists
-	}
-
 	var cancel context.CancelFunc
 	ctx, cancel = context.WithTimeout(ctx, m.timeout)
 	defer cancel()

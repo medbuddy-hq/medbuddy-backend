@@ -27,6 +27,7 @@ func Setup(validate *validator.Validate, logger *log.Logger) *gin.Engine {
 	Medicine(r, validate, ApiVersion, logger)
 	Medication(r, validate, ApiVersion, logger)
 	Dosage(r, validate, ApiVersion, logger)
+	Practitioner(r, validate, ApiVersion, logger)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{

@@ -9,6 +9,7 @@ import (
 	"medbuddy-backend/pkg/handler/practitioner"
 	"medbuddy-backend/pkg/repository/mongo"
 	patService "medbuddy-backend/service/patient"
+	practService "medbuddy-backend/service/practitioner"
 )
 
 func Auth(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger *log.Logger) *gin.Engine {
@@ -17,8 +18,8 @@ func Auth(r *gin.Engine, validate *validator.Validate, ApiVersion string, logger
 	patientService := patService.NewPatientService(dbRepo)
 	patientCtrl := patient.NewController(validate, logger, patientService)
 
-	//practitionerService := practService.NewPractionerService(dbRepo)
-	practitionerCtrl := practitioner.Controller{Validate: validate, Logger: logger}
+	practitionerService := practService.NewPractitionerService(dbRepo)
+	practitionerCtrl := practitioner.Controller{Validate: validate, Logger: logger, PractitionerService: practitionerService}
 
 	authUrl := r.Group(fmt.Sprintf("/api/%v", ApiVersion))
 	{

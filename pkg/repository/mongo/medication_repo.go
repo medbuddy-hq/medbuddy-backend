@@ -24,7 +24,7 @@ func (m *Mongo) AddMedication(ctx context.Context, data *model.Medication) error
 	return nil
 }
 
-func (m *Mongo) UpdateMedication(ctx context.Context, id primitive.ObjectID, data *model.MedicationRequest) (found bool, err error) {
+func (m *Mongo) UpdateMedication(ctx context.Context, id primitive.ObjectID, data *model.Medication) (found bool, err error) {
 	db := m.mongoclient.Database(constant.AppName)
 	mColl := db.Collection(constant.MedicationCollection)
 
@@ -32,7 +32,8 @@ func (m *Mongo) UpdateMedication(ctx context.Context, id primitive.ObjectID, dat
 	ctx, cancel = context.WithTimeout(ctx, m.timeout)
 	defer cancel()
 
-	res, err := mColl.UpdateByID(ctx, id, data)
+	update := bson.D{{"$set", *data}}
+	res, err := mColl.UpdateByID(ctx, id, update)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return false, nil
@@ -124,6 +125,30 @@ func (m *Mongo) GetPatientsMedications(ctx context.Context, patientId primitive.
 	}
 
 	return medics, nil
+}
+
+func (m *Mongo) AddPractitionerToMed(ctx context.Context, id primitive.ObjectID, practIds []primitive.ObjectID) (found bool, err error) {
+	db := m.mongoclient.Database(constant.AppName)
+	mColl := db.Collection(constant.MedicationCollection)
+
+	var cancel context.CancelFunc
+	ctx, cancel = context.WithTimeout(ctx, m.timeout)
+	defer cancel()
+
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "practitioner_ids", Value: practIds}}}}
+	res, err := mColl.UpdateByID(ctx, id, update)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return false, nil
+		}
+		return false, err
+	}
+
+	if res.MatchedCount < 1 {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 func getMedicineLookupAndUnwindStage() (medicineLookup bson.D, medicineUnwind bson.D) {

@@ -34,7 +34,6 @@ func (base *Controller) LoginPatient(c *gin.Context) {
 
 	rd := utility.BuildSuccessResponse(http.StatusOK, "patient logged in successfully", response)
 	c.JSON(rd.Code, rd)
-
 }
 
 func (base *Controller) CreatePatient(c *gin.Context) {

@@ -24,12 +24,14 @@ func PasswordIsValid(password, salt, hashedPassword string) bool {
 }
 
 func randomSalt() string {
+	space := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRST1234567890"
 	var salt string
+
 	random := rand.New(rand.NewSource(int64(time.Now().Nanosecond())))
 
 	for i := 0; i < saltLen; i++ {
-		char := random.Int31n(26) + 61
-		salt += string(char)
+		idx := random.Intn(len(space))
+		salt += string(space[idx])
 	}
 
 	return salt

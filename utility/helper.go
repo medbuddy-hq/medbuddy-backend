@@ -12,6 +12,18 @@ func RequestsToPatientResponse(patient *model.Patient, user *model.User) model.P
 	}
 }
 
+func RequestsToPractitionerResponse(pract *model.Practitioner, user *model.User) model.PractitionerResponse {
+	return model.PractitionerResponse{
+		ID:        pract.ID,
+		FullName:  pract.FullName,
+		UserID:    pract.UserId,
+		Email:     pract.Email,
+		User:      *user,
+		Expertise: pract.Expertise,
+		Title:     pract.Title,
+	}
+}
+
 func MedicineRequestToMedicine(medicine *model.MedicineRequest) model.Medicine {
 	return model.Medicine{
 		ID:           medicine.ID,

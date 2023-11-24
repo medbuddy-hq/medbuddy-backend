@@ -28,6 +28,7 @@ func Medication(r *gin.Engine, validate *validator.Validate, ApiVersion string, 
 		medicationUrl.GET("/medication/dosages", middleware.Patient(), dosageCtrl.GetMedicationDosages)
 		medicationUrl.GET("/medication", middleware.Patient(), medicationCtrl.GetPatientMedications)
 		medicationUrl.DELETE("/medication/:id", middleware.Patient(), medicationCtrl.DeleteMedication)
+		medicationUrl.PATCH("/medication/:medication-id/practitioners", middleware.Patient(), medicationCtrl.AddPractitionerToMeds)
 	}
 	return r
 }

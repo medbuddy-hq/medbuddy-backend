@@ -33,12 +33,19 @@ type StorageRepository interface {
 
 	// Medication
 	AddMedication(ctx context.Context, data *model.Medication) error
-	UpdateMedication(ctx context.Context, id primitive.ObjectID, data *model.MedicationRequest) (found bool, err error)
+	UpdateMedication(ctx context.Context, id primitive.ObjectID, data *model.Medication) (found bool, err error)
 	DeleteMedication(ctx context.Context, id primitive.ObjectID) (found bool, err error)
 	GetMedication(ctx context.Context, id primitive.ObjectID) (medic model.MedicationResponse, found bool, err error)
 	GetPatientsMedications(ctx context.Context, patientId primitive.ObjectID) (medics []model.MedicationResponse, err error)
+	AddPractitionerToMed(ctx context.Context, id primitive.ObjectID, practIds []primitive.ObjectID) (found bool, err error)
 
 	// Practitioner
+	CreatePractitioner(ctx context.Context, data *model.Practitioner) error
+	GetPractitionerByID(ctx context.Context, id primitive.ObjectID) (pract model.PractitionerResponse, found bool, err error)
+	GetPractitionersByEmail(ctx context.Context, emails []string) (practs []model.PractitionerResponse, err error)
+	GetPractitionersByIds(ctx context.Context, ids []primitive.ObjectID) (practs []model.PractitionerResponse, err error)
+	GetPractitionerByEmail(ctx context.Context, email string) (pract model.PractitionerResponse, found bool, err error)
+	GetPractitionerMedications(ctx context.Context, practitionerId primitive.ObjectID) (medics []model.MedicationResponse, err error)
 
 	// Dosage
 	SaveDosages(ctx context.Context, data []model.Dosage) error

@@ -16,6 +16,7 @@ type MedicationService interface {
 	GetPatientMedications(userInfo model.ContextInfo) ([]model.MedicationResponse, errors.InternalError)
 	UpdateMedication(userInfo *model.ContextInfo, id string, data *model.MedicationRequest) (model.MedicationResponse, errors.InternalError)
 	DeleteMedication(userInfo *model.ContextInfo, id string) errors.InternalError
+	AddPractitionersToMedication(userInfo *model.ContextInfo, medicId string, practEmails []string) (string, errors.InternalError)
 }
 
 type medicationService struct {
@@ -162,6 +163,8 @@ func (m *medicationService) GetPatientMedications(userInfo model.ContextInfo) ([
 }
 
 func (m *medicationService) UpdateMedication(userInfo *model.ContextInfo, id string, data *model.MedicationRequest) (model.MedicationResponse, errors.InternalError) {
+	//ctx := context.Background()
+
 	return model.MedicationResponse{}, nil
 }
 
@@ -193,4 +196,48 @@ func (m *medicationService) DeleteMedication(userInfo *model.ContextInfo, id str
 	}
 
 	return nil
+}
+
+func (m *medicationService) AddPractitionersToMedication(userInfo *model.ContextInfo, medicId string, practEmails []string) (string, errors.InternalError) {
+	ctx := context.Background()
+
+	medId, err := primitive.ObjectIDFromHex(medicId)
+	if err != nil {
+		logger.Error("Error converting hex Id to objectId, error: ", err.Error())
+		return "", errors.InternalServerError
+	}
+
+	medication, found, err := m.dbRepo.GetMedication(ctx, medId)
+	if err != nil {
+		logger.Error("Error fetching medication, error: ", err.Error())
+		return "", errors.InternalServerError
+	}
+
+	if !found {
+		return "", errors.ResourceNotFoundError("medication not found")
+	}
+
+	practitioners, err := m.dbRepo.GetPractitionersByEmail(ctx, practEmails)
+	if err != nil {
+		logger.Error("Error fetching specified practioner(s), error: ", err.Error())
+		return "", errors.InternalServerError
+	}
+
+	if len(practitioners) <= 0 {
+		return "", errors.BadRequestError("invalid practitioner email(s)")
+	}
+	logger.Infof("Successfully fetched %v out of %v practitioners\n", len(practitioners), len(practEmails))
+
+	practitionerIds := make([]primitive.ObjectID, len(practitioners))
+	for i, p := range practitioners {
+		practitionerIds[i] = p.ID
+	}
+	medication.PractitionerIDs = append(medication.PractitionerIDs, practitionerIds...)
+
+	if _, err := m.dbRepo.AddPractitionerToMed(ctx, medId, medication.PractitionerIDs); err != nil {
+		logger.Error("Error adding practioner(s) to medication, error: ", err.Error())
+		return "", errors.InternalServerError
+	}
+
+	return fmt.Sprintf("successfully added %v out of %v practitioner(s) to medication", len(practitionerIds), len(practEmails)), nil
 }
