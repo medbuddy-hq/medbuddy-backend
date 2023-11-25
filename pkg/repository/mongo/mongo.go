@@ -14,7 +14,6 @@ import (
 )
 
 var (
-	ctx                 context.Context
 	mongoclient         *mongo.Client
 	generalQueryTimeout = 60 * time.Second
 )
@@ -34,6 +33,7 @@ func Connection() (db *mongo.Client) {
 
 func ConnectToDB() *mongo.Client {
 	logger := utility.NewLogger()
+	ctx := context.Background()
 
 	tlsConfig := &tls.Config{}
 	tlsConfig.InsecureSkipVerify = true

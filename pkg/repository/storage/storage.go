@@ -38,6 +38,7 @@ type StorageRepository interface {
 	GetMedication(ctx context.Context, id primitive.ObjectID) (medic model.MedicationResponse, found bool, err error)
 	GetPatientsMedications(ctx context.Context, patientId primitive.ObjectID) (medics []model.MedicationResponse, err error)
 	AddPractitionerToMed(ctx context.Context, id primitive.ObjectID, practIds []primitive.ObjectID) (found bool, err error)
+	IncrementDosageTaken(ctx context.Context, medicId primitive.ObjectID) error
 
 	// Practitioner
 	CreatePractitioner(ctx context.Context, data *model.Practitioner) error

@@ -151,6 +151,29 @@ func (m *Mongo) AddPractitionerToMed(ctx context.Context, id primitive.ObjectID,
 	return true, nil
 }
 
+func (m *Mongo) IncrementDosageTaken(ctx context.Context, medicId primitive.ObjectID) error {
+	db := m.mongoclient.Database(constant.AppName)
+	mColl := db.Collection(constant.MedicationCollection)
+
+	var cancel context.CancelFunc
+	ctx, cancel = context.WithTimeout(ctx, m.timeout)
+	defer cancel()
+
+	update := bson.D{{
+		Key: "$inc", Value: bson.D{{
+			Key:   "dosages_taken",
+			Value: 1,
+		}},
+	}}
+
+	_, err := mColl.UpdateByID(ctx, medicId, update)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func getMedicineLookupAndUnwindStage() (medicineLookup bson.D, medicineUnwind bson.D) {
 	medicineLookup = bson.D{{
 		Key: "$lookup",

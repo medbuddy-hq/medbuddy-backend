@@ -2,6 +2,7 @@ package dosage
 
 import (
 	"context"
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"medbuddy-backend/internal/constant"
 	"medbuddy-backend/internal/errors"
@@ -107,6 +108,13 @@ func (d *dosageService) SetDosageStatus(uInfo *model.ContextInfo, status string,
 
 	if !found {
 		return errors.BadRequestError("dosage not found / you don't have access to dosage")
+	}
+
+	if status == constant.DosageTaken {
+		err := d.dbRepo.IncrementDosageTaken(ctx, dosage.MedicationID)
+		if err != nil {
+			log.Error("Error when incrementing dosage taken, error: ", err.Error())
+		}
 	}
 
 	return nil

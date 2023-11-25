@@ -32,7 +32,7 @@ func (base *Controller) GetPatientDosages(c *gin.Context) {
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "", dosages)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "", dosages)
 	c.JSON(rd.Code, rd)
 }
 
@@ -60,7 +60,7 @@ func (base *Controller) GetMedicationDosages(c *gin.Context) {
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "", dosages)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "", dosages)
 	c.JSON(rd.Code, rd)
 }
 
@@ -95,7 +95,7 @@ func (base *Controller) UpdateDosageStatus(c *gin.Context) {
 		return
 	}
 
-	rd := utility.BuildSuccessResponse(http.StatusCreated, "dosage status updated successfully", nil)
+	rd := utility.BuildSuccessResponse(http.StatusOK, "dosage status updated successfully", nil)
 	c.JSON(rd.Code, rd)
 }
 
