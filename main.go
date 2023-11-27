@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	mdb "medbuddy-backend/pkg/repository/mongo"
+	"medbuddy-backend/service/jobs"
 	"medbuddy-backend/utility"
 	"net/http"
 	"os"
@@ -21,6 +22,10 @@ import (
 func init() {
 	config.Setup()
 	mdb.ConnectToDB()
+
+	// Start background cron jobs
+	cJobs := jobs.NewCronJob()
+	cJobs.StartJobs()
 	// redis.SetupRedis() uncomment when you need redis
 }
 
@@ -49,7 +54,6 @@ func main() {
 
 		// Shutdown signal with grace period of 30 seconds
 		shutdownCtx, shutdownCancel := context.WithTimeout(serverCtx, 30*time.Second)
-		mdb.DisconnectDB(shutdownCtx)
 
 		go func() {
 			<-shutdownCtx.Done()
@@ -57,6 +61,9 @@ func main() {
 				logger.Fatal("graceful shutdown timed out.. forcing exit.")
 			}
 		}()
+
+		mdb.DisconnectDB(shutdownCtx)
+		jobs.StopJobs()
 
 		// Store counter variable in redis
 		// redis.StoreCounter()

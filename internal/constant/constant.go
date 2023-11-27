@@ -1,5 +1,7 @@
 package constant
 
+import "time"
+
 const AppName = "medbuddy"
 
 const (
@@ -25,10 +27,21 @@ const (
 	MedicineCollection      = "medicines"
 	MedicationCollection    = "medications"
 	DosageCollection        = "dosages"
+	TaskCollection          = "tasks"
 )
 
 const (
 	DosageTaken    = "taken"
 	DosageSkipped  = "skipped"
 	DosageNotTaken = "not taken"
+)
+
+const (
+	TaskDone   = "done"
+	TaskUndone = "undone"
+)
+
+const (
+	TimeLapseForJobs   = 10 * time.Minute
+	TimeLapseInMinutes = 10
 )

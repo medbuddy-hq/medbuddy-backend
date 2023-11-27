@@ -4,6 +4,7 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"medbuddy-backend/internal/model"
+	"time"
 )
 
 // repositories
@@ -54,4 +55,11 @@ type StorageRepository interface {
 	SetStatus(ctx context.Context, dosageId, patientId primitive.ObjectID, status string) (found bool, err error)
 	GetDosage(ctx context.Context, id primitive.ObjectID) (dosage model.DosageResponse, found bool, err error)
 	DeleteDosages(ctx context.Context, medicationId primitive.ObjectID) (int64, error)
+
+	// Task
+	AddTasks(ctx context.Context, tasks []model.Task) (int64, error)
+	UpdateTask(ctx context.Context, taskID primitive.ObjectID, status string) error
+	DeleteTasks(ctx context.Context, taskIDs []primitive.ObjectID) (int64, error)
+	GetLatestTasks(ctx context.Context, startTime time.Time) (tasks []model.LatestTaskResponse, err error)
+	GetTask(ctx context.Context, taskID primitive.ObjectID) (task model.LatestTaskResponse, found bool, err error)
 }

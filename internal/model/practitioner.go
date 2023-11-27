@@ -3,7 +3,7 @@ package model
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Practitioner struct {
-	ID        primitive.ObjectID `bson:"id,omitempty"`
+	ID        primitive.ObjectID `bson:"_id,omitempty"`
 	FullName  string             `bson:"full_name,omitempty"`
 	Title     string             `bson:"title,omitempty"`
 	Email     string             `bson:"email,omitempty"`
@@ -23,7 +23,7 @@ type PractitionerRequest struct {
 }
 
 type PractitionerResponse struct {
-	ID        primitive.ObjectID `json:"id,omitempty" bson:"_id"`
+	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id"`
 	FullName  string             `json:"fullname,omitempty" bson:"full_name"`
 	Email     string             `json:"email,omitempty" bson:"email"`
 	Expertise string             `json:"expertise,omitempty"`

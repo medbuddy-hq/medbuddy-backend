@@ -16,6 +16,8 @@ import (
 var (
 	mongoclient         *mongo.Client
 	generalQueryTimeout = 60 * time.Second
+
+	logger = utility.NewLogger()
 )
 
 type Mongo struct {
@@ -32,7 +34,6 @@ func Connection() (db *mongo.Client) {
 }
 
 func ConnectToDB() *mongo.Client {
-	logger := utility.NewLogger()
 	ctx := context.Background()
 
 	tlsConfig := &tls.Config{}
@@ -60,8 +61,8 @@ func ConnectToDB() *mongo.Client {
 func DisconnectDB(ctx context.Context) {
 	err := mongoclient.Disconnect(ctx)
 	if err != nil {
-		log.Error("Error disconnecting DB connection, error: ", err)
+		logger.Error("Error disconnecting DB connection, error: ", err)
 		return
 	}
-	log.Info("SUCCESSFULLY CLOSED DB CONNECTION")
+	logger.Info("SUCCESSFULLY CLOSED DB CONNECTION")
 }

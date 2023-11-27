@@ -18,7 +18,7 @@ func (m *Mongo) SaveDosages(ctx context.Context, data []model.Dosage) error {
 	ctx, cancel = context.WithTimeout(ctx, m.timeout)
 	defer cancel()
 
-	var records []any
+	var records []interface{}
 	for i := range data {
 		records = append(records, data[i])
 	}
@@ -61,9 +61,11 @@ func (m *Mongo) GetPatientDosages(ctx context.Context, request *model.DosageFilt
 	matchStage := bson.D{{Key: "$match", Value: filter}}
 	medicLookupStage, medicUnwindStage := getMedicationLookupAndUnwindStage()
 	medLookupStage, medUnwindStage := getDosageMedicineLookupAndUnwindStage()
+	patientLookupStage, patientUnwindStage := getDosagePatientLookupAndUnwindStage()
 	sortStage := bson.D{{Key: "$sort", Value: bson.D{{"reminder_time", 1}}}}
 
-	pipeline := mongo.Pipeline{matchStage, medicLookupStage, medicUnwindStage, medLookupStage, medUnwindStage, sortStage}
+	pipeline := mongo.Pipeline{matchStage, medicLookupStage, medicUnwindStage, medLookupStage, medUnwindStage,
+		patientLookupStage, patientUnwindStage, sortStage}
 	cur, err := dColl.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
@@ -117,9 +119,10 @@ func (m *Mongo) GetDosage(ctx context.Context, id primitive.ObjectID) (dosage mo
 	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: id}}}}
 	medicLookupStage, medicUnwindStage := getMedicationLookupAndUnwindStage()
 	medLookupStage, medUnwindStage := getDosageMedicineLookupAndUnwindStage()
-	sortStage := bson.D{{Key: "$sort", Value: bson.D{{"reminder_time", -1}}}}
+	patientLookupStage, patientUnwindStage := getDosagePatientLookupAndUnwindStage()
 
-	pipeline := mongo.Pipeline{matchStage, medicLookupStage, medicUnwindStage, medLookupStage, medUnwindStage, sortStage}
+	pipeline := mongo.Pipeline{matchStage, medicLookupStage, medicUnwindStage, medLookupStage,
+		medUnwindStage, patientLookupStage, patientUnwindStage}
 	cur, err := dColl.Aggregate(ctx, pipeline)
 	if err != nil {
 		return model.DosageResponse{}, false, err
@@ -208,6 +211,38 @@ func getDosageMedicineLookupAndUnwindStage() (medicineLookup bson.D, medicineUnw
 		Value: bson.D{{
 			Key:   "path",
 			Value: "$medication.medicine",
+		}, {
+			Key:   "preserveNullAndEmptyArrays",
+			Value: true,
+		}},
+	}}
+
+	return
+}
+
+func getDosagePatientLookupAndUnwindStage() (patientLookup bson.D, patientUnwind bson.D) {
+	patientLookup = bson.D{{
+		Key: "$lookup",
+		Value: bson.D{{
+			Key:   "from",
+			Value: "patients",
+		}, {
+			Key:   "localField",
+			Value: "patient_id",
+		}, {
+			Key:   "foreignField",
+			Value: "_id",
+		}, {
+			Key:   "as",
+			Value: "medication.patient",
+		}},
+	}}
+
+	patientUnwind = bson.D{{
+		Key: "$unwind",
+		Value: bson.D{{
+			Key:   "path",
+			Value: "$medication.patient",
 		}, {
 			Key:   "preserveNullAndEmptyArrays",
 			Value: true,

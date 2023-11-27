@@ -53,6 +53,12 @@ func GetDosages(startDate time.Time, medic *model.MedicationRequest) ([]model.Do
 		}
 	}
 
+	if len(dosages) > 0 {
+		if dosages[0].ReminderTime.Before(time.Now()) {
+			return nil, errors.BadRequestError("invalid reminder time for your first dosage")
+		}
+	}
+
 	return dosages, nil
 }
 

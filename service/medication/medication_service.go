@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"medbuddy-backend/internal/constant"
 	"medbuddy-backend/internal/errors"
 	"medbuddy-backend/internal/model"
 	"medbuddy-backend/pkg/repository/storage"
@@ -114,9 +115,30 @@ func (m *medicationService) AddMedication(userInfo *model.ContextInfo, data *mod
 		return model.MedicationResponse{}, errors.InternalServerError
 	}
 
+	var tasks []model.Task
+	for _, dosage := range dosages {
+		t := model.Task{
+			ID:           primitive.NewObjectID(),
+			Time:         dosage.ReminderTime,
+			Status:       constant.TaskUndone,
+			MedicationID: medication.ID,
+		}
+
+		tasks = append(tasks, t)
+	}
+
+	count, err := m.dbRepo.AddTasks(ctx, tasks)
+	if err != nil {
+		logger.Error("Error adding tasks in AddMedication, error: ", err.Error())
+		return model.MedicationResponse{}, errors.InternalServerError
+	}
+
+	logger.Infof("Successfully added '%v' task(s) for %v medication", count, data.Medicine.Name)
+
 	response := utility.MedicationToMedicationResponse(&medication)
 	response.Dosages = dosages
 	response.Medicine = data.Medicine
+	response.Medicine.ID = medication.MedicineID
 	response.Patient = model.Patient{ID: patientID, Email: userInfo.Email}
 
 	return response, nil
