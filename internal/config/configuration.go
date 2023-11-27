@@ -8,9 +8,11 @@ import (
 )
 
 type Configuration struct {
-	ServerPort string `mapstructure:"SERVER_PORT"`
-	SecretKey  string `mapstructure:"SECRET_KEY"`
-	MongoHost  string `mapstructure:"MONGO_HOST"`
+	ServerPort      string `mapstructure:"SERVER_PORT"`
+	SecretKey       string `mapstructure:"SECRET_KEY"`
+	MongoHost       string `mapstructure:"MONGO_HOST"`
+	MailgunEmailKey string `mapstructure:"MAILGUN_EMAIL_KEY"`
+	EmailDomain     string `mapstructure:"EMAIL_DOMAIN"`
 }
 
 // Setup initialize configuration
