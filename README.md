@@ -1,6 +1,6 @@
 # MedBuddy Backend
 
-**MedBuddy** is an mobile application designed to help patients adhere to their medication schedules. By storing dosage information and sending timely reminders, MedBuzz ensures patients can follow their prescribed treatments more effectively, and a medical practitioner can monitor the progress of each of his/her patients.
+**MedBuddy** is an web application designed to help patients adhere to their medication schedules. By storing dosage information and sending timely reminders, MedBuzz ensures patients can follow their prescribed treatments more effectively, and a medical practitioner can monitor the progress of each of his/her patients.
 
 ## Table of Contents
 
