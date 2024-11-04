@@ -103,6 +103,3 @@ Sign up at [MailGun](https://www.mailgun.com/) to enable email notifications. Ob
 
 For questions or suggestions, please reach out to [jonathanemma121@gmail.com](mailto:jonathanemma121@gmail.com) or open an issue.
 
---- 
-
-This template provides a structured format, covering essential information and guiding potential contributors on setup, usage, and contributions. Let me know if you'd like specific additions for any section!
