@@ -74,6 +74,8 @@ This Setup does not involve configuring email notification
 
 ### Usage
 
+Postman Documentation link: https://documenter.getpostman.com/view/27735481/2sAY52cKVB
+
 To Test out this backend service, the frontend live url is found at 
 [https://medbuddy-mvp.vercel.app/](https://medbuddy-mvp.vercel.app/)
 
